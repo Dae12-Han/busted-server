@@ -9,6 +9,7 @@
 3. 아래에 나와있는 구글 드라이브 주소로 가서 custom weights를 다운 후 data 파일에 붙여넣기
 4. 아래에 나와있는 '#custom yolov4' 코드 실행하기
 5. 아래에 나와있는 '#Run License Plate Recognition' 코드 실행하기
+추가해야할 내용) 한글 인식
 ```
 
 ### Conda (Recommended)
