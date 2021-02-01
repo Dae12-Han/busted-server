@@ -2,7 +2,17 @@
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
 
 ## Getting Started
+
+```bash
+1. 아나콘다 가상환경 만들기
+2. pip을 통해 필요한 라이브러리 install
+3. 아래에 나와있는 구글 드라이브 주소로 가서 custom weights를 다운 후 data 파일에 붙여넣기
+4. 아래에 나와있는 '#custom yolov4' 코드 실행하기
+5. 아래에 나와있는 '#Run License Plate Recognition' 코드 실행하기
+```
+
 ### Conda (Recommended)
+
 
 ```bash
 # Tensorflow CPU
@@ -132,131 +142,6 @@ python detect_video.py --weights ./checkpoints/custom-416 --size 416 --model yol
 Now play around with [license_plate_recognizer.py](https://github.com/theAIGuysCode/yolov4-custom-functions/blob/master/license_plate_recognizer.py) and have some fun!
 
 <a name="ocr"/>
-
-## Running Tesseract OCR on any Detections
-I have also implemented a generic use of Tesseract OCR with YOLOv4. By enabling the flag `--ocr` with any detect.py image command you can search detections for text and extract what is found. Generic preprocessing is applied on the subimage that makes up the inside of the detection bounding box. However, so many lighting or color issues require advanced preprocessing so this function is by no means perfect. You will also need to install tesseract on your local machine prior to running this flag (see links and suggestions in above section)
-
-Example command (note this image doesn't have text so will not output anything, just meant to show how command is structured):
-```
-python detect.py --weights ./checkpoints/yolov4-416 --size 416 --model yolov4 --images ./data/images/dog.jpg --ocr
-```
-
-## YOLOv4 Using TensorFlow Lite (.tflite model)
-Can also implement YOLOv4 using TensorFlow Lite. TensorFlow Lite is a much smaller model and perfect for mobile or edge devices (raspberry pi, etc).
-```bash
-# Save tf model for tflite converting
-python save_model.py --weights ./data/yolov4.weights --output ./checkpoints/yolov4-416 --input_size 416 --model yolov4 --framework tflite
-
-# yolov4
-python convert_tflite.py --weights ./checkpoints/yolov4-416 --output ./checkpoints/yolov4-416.tflite
-
-# yolov4 quantize float16
-python convert_tflite.py --weights ./checkpoints/yolov4-416 --output ./checkpoints/yolov4-416-fp16.tflite --quantize_mode float16
-
-# yolov4 quantize int8
-python convert_tflite.py --weights ./checkpoints/yolov4-416 --output ./checkpoints/yolov4-416-int8.tflite --quantize_mode int8 --dataset ./coco_dataset/coco/val207.txt
-
-# Run tflite model
-python detect.py --weights ./checkpoints/yolov4-416.tflite --size 416 --model yolov4 --images ./data/images/kite.jpg --framework tflite
-```
-### Result Image (TensorFlow Lite)
-You can find the outputted image(s) showing the detections saved within the 'detections' folder.
-#### TensorFlow Lite int8 Example
-<p align="center"><img src="data/helpers/result-int8.png" width="640"\></p>
-
-Yolov4 and Yolov4-tiny int8 quantization have some issues. I will try to fix that. You can try Yolov3 and Yolov3-tiny int8 quantization 
-
-## YOLOv4 Using TensorRT
-Can also implement YOLOv4 using TensorFlow's TensorRT. TensorRT is a high-performance inference optimizer and runtime that can be used to perform inference in lower precision (FP16 and INT8) on GPUs. TensorRT can allow up to 8x higher performance than regular TensorFlow.
-```bash# yolov3
-python save_model.py --weights ./data/yolov3.weights --output ./checkpoints/yolov3.tf --input_size 416 --model yolov3
-python convert_trt.py --weights ./checkpoints/yolov3.tf --quantize_mode float16 --output ./checkpoints/yolov3-trt-fp16-416
-
-# yolov3-tiny
-python save_model.py --weights ./data/yolov3-tiny.weights --output ./checkpoints/yolov3-tiny.tf --input_size 416 --tiny
-python convert_trt.py --weights ./checkpoints/yolov3-tiny.tf --quantize_mode float16 --output ./checkpoints/yolov3-tiny-trt-fp16-416
-
-# yolov4
-python save_model.py --weights ./data/yolov4.weights --output ./checkpoints/yolov4.tf --input_size 416 --model yolov4
-python convert_trt.py --weights ./checkpoints/yolov4.tf --quantize_mode float16 --output ./checkpoints/yolov4-trt-fp16-416
-python detect.py --weights ./checkpoints/yolov4-trt-fp16-416 --model yolov4 --images ./data/images/kite.jpg --framework trt
-```
-
-## Command Line Args Reference
-
-```bash
-save_model.py:
-  --weights: path to weights file
-    (default: './data/yolov4.weights')
-  --output: path to output
-    (default: './checkpoints/yolov4-416')
-  --[no]tiny: yolov4 or yolov4-tiny
-    (default: 'False')
-  --input_size: define input size of export model
-    (default: 416)
-  --framework: what framework to use (tf, trt, tflite)
-    (default: tf)
-  --model: yolov3 or yolov4
-    (default: yolov4)
-
-detect.py:
-  --images: path to input images as a string with images separated by ","
-    (default: './data/images/kite.jpg')
-  --output: path to output folder
-    (default: './detections/')
-  --[no]tiny: yolov4 or yolov4-tiny
-    (default: 'False')
-  --weights: path to weights file
-    (default: './checkpoints/yolov4-416')
-  --framework: what framework to use (tf, trt, tflite)
-    (default: tf)
-  --model: yolov3 or yolov4
-    (default: yolov4)
-  --size: resize images to
-    (default: 416)
-  --iou: iou threshold
-    (default: 0.45)
-  --score: confidence threshold
-    (default: 0.25)
-  --count: count objects within images
-    (default: False)
-  --dont_show: dont show image output
-    (default: False)
-  --info: print info on detections
-    (default: False)
-  --crop: crop detections and save as new images
-    (default: False)
-    
-detect_video.py:
-  --video: path to input video (use 0 for webcam)
-    (default: './data/video/video.mp4')
-  --output: path to output video (remember to set right codec for given format. e.g. XVID for .avi)
-    (default: None)
-  --output_format: codec used in VideoWriter when saving video to file
-    (default: 'XVID)
-  --[no]tiny: yolov4 or yolov4-tiny
-    (default: 'false')
-  --weights: path to weights file
-    (default: './checkpoints/yolov4-416')
-  --framework: what framework to use (tf, trt, tflite)
-    (default: tf)
-  --model: yolov3 or yolov4
-    (default: yolov4)
-  --size: resize images to
-    (default: 416)
-  --iou: iou threshold
-    (default: 0.45)
-  --score: confidence threshold
-    (default: 0.25)
-  --count: count objects within video
-    (default: False)
-  --dont_show: dont show video output
-    (default: False)
-  --info: print info on detections
-    (default: False)
-  --crop: crop detections and save as new images
-    (default: False)
-```
 
 ### References  
 
